@@ -1,13 +1,13 @@
 steps:
 # Step 1
-- name: 'gcr.io/cloud-builders/docker1' 
+- name: 'gcr.io/gcb-security-bu/docker1' 
   entrypoint: 'bash'
   args: [
    '-c', 
    'docker pull gcr.io/$PROJECT_ID/docker-spring-boot-java-web:latest || exit 0'
   ]
 # Step 2
-- name: gcr.io/cloud-builders/docker1
+- name: gcr.io/gcb-security-bu/docker1
   args: [
    'build', 
    '-t', 
@@ -35,7 +35,7 @@ steps:
   - 'CLOUDSDK_CONTAINER_CLUSTER=gke-my-app-vue'
   # Push the image to Google Container Registry with the latest tag
 images: [
-   'gcr.io/$PROJECT_ID/my-app-vue:latest'
+   'gcr.io/$PROJECT_ID/docker-spring-boot-java-web:latest'
   ]
 options:
   logging: CLOUD_LOGGING_ONLY
