@@ -1,8 +1,8 @@
 steps:
 # Step 1
 #Step 1: Build with Maven
-  - name: 'maven:3.8.4'
-    args: ['mvn', 'clean', 'install']
+- name: 'maven:3.8.4'
+  args: ['mvn', 'clean', 'install']
 - name: gcr.io/cloud-builders/docker
   args: [
    'build', 
