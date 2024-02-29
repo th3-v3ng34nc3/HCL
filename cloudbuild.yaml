@@ -13,6 +13,28 @@ steps:
 # Step 2
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/docker-spring-boot-java-web:latest']
+# Step 3
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', '-f', 'k8s/']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
+# Step 4
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: [
+   'set', 
+   'image', 
+   'deployment', 
+   '', 
+   'docker-spring-boot-java-web=gcr.io/$PROJECT_ID/docker-spring-boot-java-web:latest'
+  ]
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
+  # Push the image to Google Container Registry with the latest tag
+images: [
+   'gcr.io/$PROJECT_ID/docker-spring-boot-java-web:latest'
+  ]
 
 options:
   logging: CLOUD_LOGGING_ONLY
