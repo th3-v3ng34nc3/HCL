@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: spring-boot-java-web
+  name: spring-boot-java-web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      run: spring-boot-java-web
+  template:
+    metadata:
+      labels:
+        run: spring-boot-java-web
+    spec:
+      containers:
+      - image: gcr.io/gcb-security-bu/docker-spring-boot-java-web:latest #Replace [PROJECT-ID] accordingly
+        name: spring-boot-java-web
+        ports:
+        - containerPort: 8080
