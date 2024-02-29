@@ -1,12 +1,12 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: my-app-vue
+  name: spring-boot-java-web
 spec:
   selector:
-     run: my-app-vue
+     run: spring-boot-java-web
   ports:
   - protocol: TCP
     port: 80
     targetPort: 8080
-  type: LoadBalancer
+  type: NodePort
