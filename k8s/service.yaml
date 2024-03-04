@@ -7,6 +7,6 @@ spec:
      run: spring-boot-java-web
   ports:
   - protocol: TCP
-    port: 80
+    port: 8081
     targetPort: 8080
   type: NodePort
