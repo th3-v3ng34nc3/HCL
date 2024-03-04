@@ -20,7 +20,7 @@ steps:
   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
   - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
 # Step 4
-- name: 'gcr.io/cloud-builders/kubectl'
+- name: 'gcr.io/cloud-builders/kubectl-1'
   args: [
    'set', 
    'image', 
