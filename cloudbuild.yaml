@@ -24,7 +24,7 @@ steps:
    'set', 
    'image', 
    'deployment', 
-   '', 
+   ' spring-boot-java-web ', 
    'spring-boot-java-web=gcr.io/$PROJECT_ID/docker-spring-boot-java-web:latest'
   ]
   env:
