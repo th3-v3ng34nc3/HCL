@@ -26,7 +26,7 @@ steps:
    'image', 
    'deployment', 
    '', 
-   'docker-spring-boot-java-web=gcr.io/$PROJECT_ID/docker-spring-boot-java-web:latest'
+   'spring-boot-java-web=gcr.io/$PROJECT_ID/docker-spring-boot-java-web:latest'
   ]
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
