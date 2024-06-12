@@ -50,12 +50,12 @@ steps:
     waitFor: ['accuknox-container-scan']
 
   # Step 8: Exit if Critical or High Vulnerabilities are Found
-  - name: 'bash'
+  - name: 'ubuntu'
     entrypoint: 'bash'
     args:
       [
         '-c',
-        'if grep -q -E '"'"'CRITICAL|HIGH'"'"' /workspace/accuknox-report.json; then exit 1; else exit 0; fi'
+        'jq ".vulnerabilities | if length == 0 then exit 0 else exit 1 end" /workspace/accuknox-report.json'
       ]
     waitFor: ['accuknox-container-scan']
 
@@ -82,7 +82,9 @@ steps:
     waitFor: ['accuknox-container-scan']
 
 # Push the image to Google Container Registry with the latest tag
-images: ['gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest']
+images: [
+   'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest'
+]
 
 # Specify the logs bucket and build timeout
 logsBucket: 'gs://aditya-cicd-test'
