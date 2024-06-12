@@ -38,8 +38,8 @@ steps:
         echo "Error: The vulnerability report is empty or null."
         exit 1
         fi
-        critical_vulns=$(echo "$report" | jq '.vulnerabilities[] | select(.severity == "CRITICAL")' | jq length)
-        high_vulns=$(echo "$report" | jq '.vulnerabilities[] | select(.severity == "HIGH")' | jq length)
+        critical_vulns=$(echo "$report" | jq '.vulnerabilities[]? | select(.severity == "CRITICAL")' | jq length)
+        high_vulns=$(echo "$report" | jq '.vulnerabilities[]? | select(.severity == "HIGH")' | jq length)
 
         if [ -z "$critical_vulns" ] || [ -z "$high_vulns" ]; then
         echo "Error: Failed to parse the vulnerability report."
