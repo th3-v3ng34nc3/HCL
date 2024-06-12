@@ -25,28 +25,25 @@ steps:
     args: ['image', '--format', 'json', '--output', '/workspace/accuknox-report.json', '$_IMAGE_URL:$_IMAGE_TAG']
     id: 'accuknox-container-scan'
 
-  # Step 4: Analyze the scan report for critical and high severity vulnerabilities
-  - name: 'python'
-    entrypoint: 'python'
+  # Step 4: Install jq and analyze the scan report for critical and high severity vulnerabilities using bash with jq
+  - name: 'gcr.io/cloud-builders/bash'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
-        import json
-        import sys
-
-        with open('/workspace/accuknox-report.json') as f:
-            report = json.load(f)
-
-        critical_vulns = [v for v in report.get('vulnerabilities', []) if v['severity'] == 'CRITICAL']
-        high_vulns = [v for v in report.get('vulnerabilities', []) if v['severity'] == 'HIGH']
-
-        if critical_vulns or high_vulns:
-            print(f"Found {len(critical_vulns)} critical and {len(high_vulns)} high severity vulnerabilities.")
-            sys.exit(1)
-        else:
-            print("No critical or high severity vulnerabilities found.")
+        apt-get update && apt-get install -y jq
+        report=$(cat /workspace/accuknox-report.json)
+        critical_vulns=$(echo "$report" | jq '.vulnerabilities[] | select(.severity == "CRITICAL")' | jq length)
+        high_vulns=$(echo "$report" | jq '.vulnerabilities[] | select(.severity == "HIGH")' | jq length)
+        if [ "$critical_vulns" -gt 0 ] || [ "$high_vulns" -gt 0 ]; then
+            echo "Found $critical_vulns critical and $high_vulns high severity vulnerabilities."
+            exit 1
+        else
+            echo "No critical or high severity vulnerabilities found."
+        fi
     waitFor: ['accuknox-container-scan']
 
+  # Steps 5, 6, and 7 remain the same...
   # Step 5: Upload the AccuKnox report to Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['cp', '/workspace/accuknox-report.json', 'gs://aditya-cicd-test/accuknox-report.json']
@@ -83,7 +80,6 @@ steps:
             print(f"Exiting due to {len(critical_vulns)} critical and {len(high_vulns)} high severity vulnerabilities.")
             sys.exit(1)
     waitFor: ['accuknox-container-scan']
-
   # Step 8: Apply Kubernetes Configuration and Update Deployment Image
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/']
@@ -102,4 +98,3 @@ steps:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
       - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
     waitFor: ['accuknox-container-scan']
-
