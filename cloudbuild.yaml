@@ -16,7 +16,7 @@ steps:
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['apply', '-f', 'k8s/']
   env:
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+  - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
   - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
 # Step 4
 - name: 'gcr.io/cloud-builders/kubectl'
@@ -28,7 +28,7 @@ steps:
    'spring-boot-java-web=gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest'
   ]
   env:
-  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+  - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
   - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
   # Push the image to Google Container Registry with the latest tag
 images: [
