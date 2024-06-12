@@ -26,7 +26,7 @@ steps:
     id: 'accuknox-container-scan'
 
   # Step 4: Install jq and analyze the scan report for critical and high severity vulnerabilities using bash with jq
-  - name: 'gcr.io/cloud-builders/google-cloud-sdk:480.0.0'
+  - name: 'ubuntu'
     entrypoint: 'bash'
     args:
       - '-c'
