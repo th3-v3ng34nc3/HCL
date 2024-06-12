@@ -50,8 +50,16 @@ steps:
         'curl --location --request POST "https://${_CSPM_URL}/api/v1/artifact/?tenant_id=${_TENANT_ID}&data_type=TR&save_to_s3=false"  --header "Tenant-Id: 167" --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIwNTg0NDgxLCJqdGkiOiJlOTMzZjBiMjRmOTE0ZDEwOGYzY2RlZGI4MGNmMGFmZCIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.aZW3andqtR8-mW_CgdzPDUu-Vow2whoOUjpyGxnfUVcfRfiJpkIlATlFDmPhOR3PHc6tJuxxfZBcyxiX4pXcFBMEAtFMUMK3bIA3oOftALuCxLW5W4DS6PzeOXjNZn9_ijadh8d6UJvw4JOAByXRcwu9XNSwICn-pb4BqfIvu7tL_sHRWMFKt4C5Mo97FNr48keXzOeWzy4TiqMCwTKBzwtJbBt3NrgvWoTZzpJx1ioWGnVcQRHphDL0xA6OmyZYw5qOEJ5y8yv5rDt0p5JUWD5EiemF8Pq-0_OXBZ0TU-a-4deBWMnwSqO-i2C7cxzA_d0hC1fRcVhJ7PFnALFXcA" --form "file=@/workspace/accuknox-report.json"'
       ]
     waitFor: ['accuknox-container-scan']
+  # Step 8: Exit if Critical or High Vulnerabilities are Found
+  - name: 'ubuntu'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        jq ".vulnerabilities | if length == 0 then exit 0 else exit 1 end" /workspace/accuknox-report.json
+    waitFor: ['accuknox-container-scan']
 
-  # Step 8: Apply Kubernetes Configuration
+  # Step 9: Apply Kubernetes Configuration
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/']
     env:
@@ -59,7 +67,7 @@ steps:
       - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
     waitFor: ['accuknox-container-scan']
 
-  # Step 9: Update the Deployment Image
+  # Step 10: Update the Deployment Image
   - name: 'gcr.io/cloud-builders/kubectl'
     args: [
       'set', 
