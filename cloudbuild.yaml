@@ -16,48 +16,37 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest']
 
-  # Step 4: Install jq
+  # Step 4: Install jq and Scan the container image with AccuKnox
   - name: 'ubuntu'
-    entrypoint: 'apt-get'
-    args: ['update', '-y']
-  - name: 'ubuntu'
-    entrypoint: 'apt-get'
-    args: ['install', '-y', 'jq']
-
-  # Step 5: Scan the container image with AccuKnox and save the report
-  - name: 'accuknox/accuknox-container-scan'
-    args: [
-      'image', 
-      '--format', 'json', 
-      '--output', '/workspace/accuknox-report.json', 
-      '${_IMAGE_URL}:${_IMAGE_TAG}',
-      '--exit-code', '1',
-      '--severity', 'HIGH,CRITICAL'
-    ]
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update && apt-get install -y jq
+        accuknox/accuknox-container-scan image --format json --output /workspace/accuknox-report.json ${_IMAGE_URL}:${_IMAGE_TAG}
     id: 'accuknox-container-scan'
 
-  # Step 6: Upload the AccuKnox report to Cloud Storage
+  # Step 5: Upload the AccuKnox report to Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['cp', '/workspace/accuknox-report.json', 'gs://aditya-cicd-test/accuknox-report.json']
     waitFor: ['accuknox-container-scan']
 
-  # Step 7: Print the AccuKnox container scan results
+  # Step 6: Print the AccuKnox container scan results
   - name: 'ubuntu'
     entrypoint: 'cat'
     args: ['/workspace/accuknox-report.json']
     waitFor: ['accuknox-container-scan']
 
-  # Step 8: Exit if Critical or High Vulnerabilities are Found
+  # Step 7: Exit if Critical or High Vulnerabilities are Found
   - name: 'ubuntu'
     entrypoint: 'bash'
     args:
-      [
-        '-c',
-        'jq ".vulnerabilities | if length == 0 then exit 0 else exit 1 end" /workspace/accuknox-report.json'
-      ]
+      - '-c'
+      - |
+        jq ".vulnerabilities | if length == 0 then exit 0 else exit 1 end" /workspace/accuknox-report.json
     waitFor: ['accuknox-container-scan']
 
-  # Step 9: Apply Kubernetes Configuration
+  # Step 8: Apply Kubernetes Configuration
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/']
     env:
@@ -65,7 +54,7 @@ steps:
       - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
     waitFor: ['accuknox-container-scan']
 
-  # Step 10: Update the Deployment Image
+  # Step 9: Update the Deployment Image
   - name: 'gcr.io/cloud-builders/kubectl'
     args: [
       'set', 
