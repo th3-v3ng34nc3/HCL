@@ -33,6 +33,11 @@ steps:
       - |
         apt-get update && apt-get install -y jq
         report=$(cat /workspace/accuknox-report.json)
+        # Check if the report is empty or null
+        if [ -z "$report" ] || [ "$report" == "null" ]; then
+        echo "Error: The vulnerability report is empty or null."
+        exit 1
+        fi
         critical_vulns=$(echo "$report" | jq '.vulnerabilities[] | select(.severity == "CRITICAL")' | jq length)
         high_vulns=$(echo "$report" | jq '.vulnerabilities[] | select(.severity == "HIGH")' | jq length)
 
