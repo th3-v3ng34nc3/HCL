@@ -54,7 +54,7 @@ steps:
     args: ['apply', '-f', 'k8s/']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu']
+      - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
     waitFor: ['accuknox-container-scan']
 
   # Step 9: Update the Deployment Image
@@ -68,7 +68,7 @@ steps:
     ]
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu']
+      - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
     waitFor: ['accuknox-container-scan']
 
 # Push the image to Google Container Registry with the latest tag
