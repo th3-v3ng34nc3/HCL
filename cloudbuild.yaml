@@ -23,6 +23,8 @@ steps:
       '--format', 'json', 
       '--output', '/workspace/accuknox-report.json', 
       '${_IMAGE_URL}:${_IMAGE_TAG}',
+      '--exit-code', '1',
+      '--severity', 'HIGH,CRITICAL'
     ]
     id: 'accuknox-container-scan'
 
@@ -79,18 +81,20 @@ steps:
       - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
     waitFor: ['accuknox-container-scan']
 
-# Push the image to Google Container Registry with the latest tag
-images: [
-   'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest'
-]
+  # Push the image to Google
+
+  # Push the image to Google Container Registry with the latest tag
+  images: [
+     'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest'
+  ]
 
 # Specify the logs bucket and build timeout
-logsBucket: 'gs://aditya-cicd-test'
-timeout: '1200s'
+  logsBucket: 'gs://aditya-cicd-test'
+  timeout: '1200s'
 
 # Define substitutions
-substitutions:
-  _IMAGE_URL: 'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web'
-  _IMAGE_TAG: 'latest'
-  _CSPM_URL: 'cspm.demo.accuknox.com'
-  _TENANT_ID: '167'
+  substitutions:
+    _IMAGE_URL: 'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web'
+    _IMAGE_TAG: 'latest'
+    _CSPM_URL: 'cspm.demo.accuknox.com'
+    _TENANT_ID: '167'
