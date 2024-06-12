@@ -64,8 +64,6 @@ steps:
         --form "file=@/workspace/accuknox-report.json"
     waitFor: ['accuknox-container-scan']
 
-  # Step 7: Exit if
-
   # Step 7: Exit if Critical or High Vulnerabilities are Found
   - name: 'python'
     entrypoint: 'python'
@@ -93,7 +91,6 @@ steps:
     - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
     - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
   waitFor: ['accuknox-container-scan']
-
 - name: 'gcr.io/cloud-builders/kubectl'
   args: 
     - 'set'
