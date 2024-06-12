@@ -82,9 +82,7 @@ steps:
     waitFor: ['accuknox-container-scan']
 
 # Push the image to Google Container Registry with the latest tag
-images: [
-   'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest'
-]
+images: ['gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest']
 
 # Specify the logs bucket and build timeout
 logsBucket: 'gs://aditya-cicd-test'
