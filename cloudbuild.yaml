@@ -35,12 +35,19 @@ steps:
         report=$(cat /workspace/accuknox-report.json)
         critical_vulns=$(echo "$report" | jq '.vulnerabilities[] | select(.severity == "CRITICAL")' | jq length)
         high_vulns=$(echo "$report" | jq '.vulnerabilities[] | select(.severity == "HIGH")' | jq length)
-        if [ "$critical_vulns" -gt 0 ] || [ "$high_vulns" -gt 0 ]; then
-            echo "Found $critical_vulns critical and $high_vulns high severity vulnerabilities."
-            exit 1
-        else
-            echo "No critical or high severity vulnerabilities found."
+
+        if [ -z "$critical_vulns" ] || [ -z "$high_vulns" ]; then
+        echo "Error: Failed to parse the vulnerability report."
+        exit 1
         fi
+
+        if [ "$critical_vulns" -gt 0 ] || [ "$high_vulns" -gt 0 ]; then
+        echo "Found $critical_vulns critical and $high_vulns high severity vulnerabilities."
+        exit 1
+        else
+        echo "No critical or high severity vulnerabilities found."
+        fi
+
     waitFor: ['accuknox-container-scan']
 
   # Steps 5, 6, and 7 remain the same...
