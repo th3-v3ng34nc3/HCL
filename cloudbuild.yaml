@@ -103,3 +103,4 @@ steps:
     - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
     - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
   waitFor: ['accuknox-container-scan']
+
