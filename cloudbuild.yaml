@@ -18,15 +18,14 @@ steps:
 
   # Step 4: Install jq
   - name: 'ubuntu'
-    entrypoint: 'apt'
-    args: ['update', '-y',]
-  - name: 'ubuntu'
-    entrypoint: 'apt'
-    args: ['upgrade', '-y',]
-  - name: 'ubuntu'
-    entrypoint: 'apt'
-    args: ['install', '-y', 'jq']
-
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update && \
+        apt-get install -y curl && \
+        curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq && \
+        chmod +x /usr/local/bin/jq
   # Step 5: Scan the container image with AccuKnox and save the report
   - name: 'accuknox/accuknox-container-scan'
     args: [
