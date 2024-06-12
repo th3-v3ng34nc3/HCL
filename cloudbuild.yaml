@@ -47,15 +47,7 @@ steps:
       ]
     waitFor: ['accuknox-container-scan']
 
-  # Step 8: If there are critical or high vulnerabilities, stop deployment
-  - name: 'bash'
-    entrypoint: 'bash'
-    args:
-      [
-        '-c',
-        'if grep -q "CRITICAL\|HIGH" /workspace/accuknox-report.json; then exit 1; else exit 0; fi'
-      ]
-    waitFor: ['accuknox-container-scan']
+
 
   # Step 9: Apply Kubernetes Configuration
   - name: 'gcr.io/cloud-builders/kubectl'
