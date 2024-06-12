@@ -64,6 +64,8 @@ steps:
         --form "file=@/workspace/accuknox-report.json"
     waitFor: ['accuknox-container-scan']
 
+  # Step 7: Exit if
+
   # Step 7: Exit if Critical or High Vulnerabilities are Found
   - name: 'python'
     entrypoint: 'python'
