@@ -35,5 +35,5 @@ images: [
    'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest'
   ]
 
-options:
-  logging: CLOUD_LOGGING_ONLY
+logsBucket: 'gs://aditya-cicd-test'
+timeout: '1200s'
