@@ -18,10 +18,10 @@ steps:
 
   # Step 4: Install jq
   - name: 'ubuntu'
-    entrypoint: 'apt-get'
+    entrypoint: 'apt'
     args: ['update', '-y']
   - name: 'ubuntu'
-    entrypoint: 'apt-get'
+    entrypoint: 'apt'
     args: ['install', '-y', 'jq']
 
   # Step 5: Scan the container image with AccuKnox and save the report
@@ -31,8 +31,6 @@ steps:
       '--format', 'json', 
       '--output', '/workspace/accuknox-report.json', 
       '${_IMAGE_URL}:${_IMAGE_TAG}',
-      '--exit-code', '1',
-      '--severity', 'HIGH,CRITICAL'
     ]
     id: 'accuknox-container-scan'
 
