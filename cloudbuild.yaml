@@ -19,7 +19,10 @@ steps:
   # Step 4: Install jq
   - name: 'ubuntu'
     entrypoint: 'apt'
-    args: ['update', '-y']
+    args: ['update', '-y',]
+  - name: 'ubuntu'
+    entrypoint: 'apt'
+    args: ['upgrade', '-y',]
   - name: 'ubuntu'
     entrypoint: 'apt'
     args: ['install', '-y', 'jq']
