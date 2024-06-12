@@ -2,7 +2,7 @@ steps:
   # Step 1: Build with Maven
   - name: 'maven:3.8.4'
     args: ['mvn', 'clean', 'install']
-    
+
   # Step 2: Build the Docker Image
   - name: gcr.io/cloud-builders/docker
     args: [
@@ -11,11 +11,11 @@ steps:
       'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest',
       '.'
     ]
-    
+
   # Step 3: Push the Docker Image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest']
-    
+
   # Step 4: Scan the container image with AccuKnox and save the report
   - name: 'accuknox/accuknox-container-scan'
     args: [
@@ -27,12 +27,12 @@ steps:
       '--severity', 'HIGH,CRITICAL'
     ]
     id: 'accuknox-container-scan'
-    
+
   # Step 5: Upload the AccuKnox report to Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['cp', '/workspace/accuknox-report.json', 'gs://aditya-cicd-test/accuknox-report.json']
     waitFor: ['accuknox-container-scan']
-    
+
   # Step 6: Print the AccuKnox container scan results
   - name: 'ubuntu'
     entrypoint: 'cat'
@@ -54,7 +54,7 @@ steps:
     args: ['apply', '-f', 'k8s/']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu']
     waitFor: ['accuknox-container-scan']
 
   # Step 9: Update the Deployment Image
@@ -68,7 +68,7 @@ steps:
     ]
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu']
     waitFor: ['accuknox-container-scan']
 
 # Push the image to Google Container Registry with the latest tag
