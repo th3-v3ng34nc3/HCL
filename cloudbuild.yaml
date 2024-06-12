@@ -18,7 +18,14 @@ steps:
     
   # Step 4: Scan the container image with AccuKnox and save the report
   - name: 'accuknox/accuknox-container-scan'
-    args: ['image', '--format', 'json', '--output', '/workspace/accuknox-report.json', '${_IMAGE_URL}:${_IMAGE_TAG}' '--exit-code', '1', '--severity', 'HIGH', 'CRITICAL']
+    args: [
+      'image', 
+      '--format', 'json', 
+      '--output', '/workspace/accuknox-report.json', 
+      '${_IMAGE_URL}:${_IMAGE_TAG}',
+      '--exit-code', '1',
+      '--severity', 'HIGH,CRITICAL'
+    ]
     id: 'accuknox-container-scan'
     
   # Step 5: Upload the AccuKnox report to Cloud Storage
