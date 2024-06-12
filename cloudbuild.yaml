@@ -16,17 +16,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest']
 
-  # Step 4: Install jq
-  - name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        apt-get update && \
-        apt-get install -y curl && \
-        curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq && \
-        chmod +x /usr/local/bin/jq
-  # Step 5: Scan the container image with AccuKnox and save the report
+  # Step 4: Scan the container image with AccuKnox and save the report
   - name: 'accuknox/accuknox-container-scan'
     args: [
       'image', 
@@ -36,9 +26,15 @@ steps:
     ]
     id: 'accuknox-container-scan'
 
-  # Step 6: Upload the AccuKnox report to Cloud Storage
+  # Step 5: Upload the AccuKnox report to Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['cp', '/workspace/accuknox-report.json', 'gs://aditya-cicd-test/accuknox-report.json']
+    waitFor: ['accuknox-container-scan']
+
+  # Step 6: Print the AccuKnox container scan results
+  - name: 'ubuntu'
+    entrypoint: 'cat'
+    args: ['/workspace/accuknox-report.json']
     waitFor: ['accuknox-container-scan']
 
   # Step 7: Forward the logs to the SaaS platform using curl
@@ -50,13 +46,15 @@ steps:
         'curl --location --request POST "https://${_CSPM_URL}/api/v1/artifact/?tenant_id=${_TENANT_ID}&data_type=TR&save_to_s3=false"  --header "Tenant-Id: 167" --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIwNTg0NDgxLCJqdGkiOiJlOTMzZjBiMjRmOTE0ZDEwOGYzY2RlZGI4MGNmMGFmZCIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.aZW3andqtR8-mW_CgdzPDUu-Vow2whoOUjpyGxnfUVcfRfiJpkIlATlFDmPhOR3PHc6tJuxxfZBcyxiX4pXcFBMEAtFMUMK3bIA3oOftALuCxLW5W4DS6PzeOXjNZn9_ijadh8d6UJvw4JOAByXRcwu9XNSwICn-pb4BqfIvu7tL_sHRWMFKt4C5Mo97FNr48keXzOeWzy4TiqMCwTKBzwtJbBt3NrgvWoTZzpJx1ioWGnVcQRHphDL0xA6OmyZYw5qOEJ5y8yv5rDt0p5JUWD5EiemF8Pq-0_OXBZ0TU-a-4deBWMnwSqO-i2C7cxzA_d0hC1fRcVhJ7PFnALFXcA" --form "file=@/workspace/accuknox-report.json"'
       ]
     waitFor: ['accuknox-container-scan']
-  # Step 8: Exit if Critical or High Vulnerabilities are Found
-  - name: 'ubuntu'
+
+  # Step 8: If there are critical or high vulnerabilities, stop deployment
+  - name: 'bash'
     entrypoint: 'bash'
     args:
-      - '-c'
-      - |
-        jq ".vulnerabilities | if length == 0 then exit 0 else exit 1 end" /workspace/accuknox-report.json
+      [
+        '-c',
+        'if jq ".Vulnerabilities[] | select(.Severity == \"CRITICAL\" or .Severity == \"HIGH\")" /workspace/accuknox-report.json > /dev/null; then exit 1; else exit 0; fi'
+      ]
     waitFor: ['accuknox-container-scan']
 
   # Step 9: Apply Kubernetes Configuration
