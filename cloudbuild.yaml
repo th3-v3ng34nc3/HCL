@@ -71,6 +71,7 @@ steps:
       - |
         import json
         import sys
+        import os
 
         vuln_count_path = '/workspace/vuln_count.json'
 
