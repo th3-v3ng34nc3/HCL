@@ -22,25 +22,36 @@ steps:
       - |
         import json
         import sys
+        import os
 
-        with open('/workspace/accuknox-report.json') as f:
+        report_path = '/workspace/accuknox-report.json'
+        vuln_count_path = '/workspace/vuln_count.json'
+
+        if not os.path.exists(report_path):
+            print(f"Report file '{report_path}' not found.")
+            sys.exit(1)
+
+        with open(report_path) as f:
             report = json.load(f)
         critical_vulns = [v for v in report.get('vulnerabilities', []) if v['severity'] == 'CRITICAL']
         high_vulns = [v for v in report.get('vulnerabilities', []) if v['severity'] == 'HIGH']
         print(f"Found {len(critical_vulns)} critical and {len(high_vulns)} high severity vulnerabilities.")
-        with open('/workspace/vuln_count.json', 'w') as count_file:
+        with open(vuln_count_path, 'w') as count_file:
             json.dump({'critical': len(critical_vulns), 'high': len(high_vulns)}, count_file)
     waitFor: ['accuknox-container-scan']
 
+  # Upload the AccuKnox report to Cloud Storage
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['cp', '/workspace/accuknox-report.json', 'gs://aditya-cicd-test/accuknox-report.json']
     waitFor: ['accuknox-container-scan']
     
+  # Print the AccuKnox container scan results
   - name: 'ubuntu'
     entrypoint: 'cat'
     args: ['/workspace/accuknox-report.json']
     waitFor: ['accuknox-container-scan']
 
+  # Forward the logs to the SaaS platform using curl
   - name: 'gcr.io/cloud-builders/curl'
     entrypoint: 'bash'
     args:
@@ -52,7 +63,7 @@ steps:
         --form "file=@/workspace/accuknox-report.json"
     waitFor: ['accuknox-container-scan']
 
-  # Step 5: Exit if Critical or High Vulnerabilities are Found
+  # Exit if Critical or High Vulnerabilities are Found
   - name: 'python'
     entrypoint: 'python'
     args:
@@ -61,7 +72,13 @@ steps:
         import json
         import sys
 
-        with open('/workspace/vuln_count.json') as f:
+        vuln_count_path = '/workspace/vuln_count.json'
+
+        if not os.path.exists(vuln_count_path):
+            print(f"Vulnerability count file '{vuln_count_path}' not found.")
+            sys.exit(1)
+
+        with open(vuln_count_path) as f:
             counts = json.load(f)
         if counts['critical'] > 0 or counts['high'] > 0:
             print(f"Exiting due to {counts['critical']} critical and {counts['high']} high severity vulnerabilities.")
@@ -70,7 +87,7 @@ steps:
             print("No critical or high severity vulnerabilities found.")
     waitFor: ['accuknox-container-scan']
 
-  # Step 6: Apply Kubernetes Configuration and Update Deployment Image
+  # Apply Kubernetes Configuration and Update Deployment Image
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/']
     env: ['CLOUDSDK_COMPUTE_ZONE=us-west1-a', 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu']
@@ -83,18 +100,4 @@ steps:
         'spring-boot-java-web=gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest'
       ]
     env: ['CLOUDSDK_COMPUTE_ZONE=us-west1-a', 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu']
-    waitFor: ['accuknox-container-scan']
-
-# Push the image to Google Container Registry with the latest tag
-images: ['gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest']
-
-# Specify the logs bucket and build timeout
-logsBucket: 'gs://aditya-cicd-test'
-timeout: '1200s'
-
-# Define substitutions
-substitutions:
-  _IMAGE_URL: 'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web'
-  _IMAGE_TAG: 'latest'
-  _CSPM_URL: 'cspm.demo.accuknox.com'
-  _TENANT_ID: '167'
+   
