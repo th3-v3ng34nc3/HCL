@@ -1,5 +1,5 @@
 # Use an official OpenJDK runtime as a parent image
-FROM openjdk:11-jre-alpine
+FROM openjdk:24-jdk-alpine3.20.0
 
 # set shell to bash
 # source: https://stackoverflow.com/a/40944512/3128926
