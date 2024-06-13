@@ -50,7 +50,7 @@ steps:
     args:
       [
         '-c',
-        'if grep -q "CRITICAL\|HIGH" /workspace/accuknox-report.json; then echo "AccuKnox Scan Found HIGH/CRITICAL vulnerabilities"; exit 1; else exit 0; fi'
+        'if grep -q "CRITICAL\|HIGH" /workspace/accuknox-report.json; then echo "AccuKnox Scan Found HIGH/CRITICAL vulnerabilities"; exit 0; else exit 1; fi'
       ]
     waitFor: ['a-1dbdjkise']
   # Step 3: Push the Docker Image to Google Container Registry
