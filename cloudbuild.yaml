@@ -57,7 +57,7 @@ steps:
         'if grep -q "CRITICAL\|HIGH" /workspace/accuknox-report.json; then exit 1; else exit 0; fi'
       ]
     waitFor: ['a-1dbdjkise']
-    id: 'a-1dbdjkisef'
+
 
   # Step 9: Apply Kubernetes Configuration
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -65,7 +65,7 @@ steps:
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
       - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
-    waitFor: ['a-1dbdjkisef']
+
 
   # Step 10: Update the Deployment Image
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -79,7 +79,6 @@ steps:
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
       - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
-    waitFor: ['a-1dbdjkisef']
 
 # Push the image to Google Container Registry with the latest tag
 images: [
