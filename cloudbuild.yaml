@@ -12,10 +12,6 @@ steps:
       '.'
     ]
 
-  # Step 3: Push the Docker Image to Google Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest']
-
   # Step 4: Scan the container image with AccuKnox and save the report
   - name: 'accuknox/accuknox-container-scan'
     args: [
@@ -54,10 +50,12 @@ steps:
     args:
       [
         '-c',
-        'if grep -q "CRITICAL\|HIGH" /workspace/accuknox-report.json; then echo "AccuKnox Scan Found HIGH/CRITICAL vulnerabilities; exit 1; else exit 0; fi'
+        'if grep -q "CRITICAL\|HIGH" /workspace/accuknox-report.json; then echo "AccuKnox Scan Found HIGH/CRITICAL vulnerabilities"; exit 1; else exit 0; fi'
       ]
     waitFor: ['a-1dbdjkise']
-
+  # Step 3: Push the Docker Image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/shaped-infusion-402417/docker-spring-boot-java-web:latest']
 
   # Step 9: Apply Kubernetes Configuration
   - name: 'gcr.io/cloud-builders/kubectl'
