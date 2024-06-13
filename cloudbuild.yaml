@@ -46,7 +46,7 @@ steps:
         'curl --location --request POST "https://${_CSPM_URL}/api/v1/artifact/?tenant_id=${_TENANT_ID}&data_type=TR&save_to_s3=false"  --header "Tenant-Id: 167" --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzIwNTg0NDgxLCJqdGkiOiJlOTMzZjBiMjRmOTE0ZDEwOGYzY2RlZGI4MGNmMGFmZCIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.aZW3andqtR8-mW_CgdzPDUu-Vow2whoOUjpyGxnfUVcfRfiJpkIlATlFDmPhOR3PHc6tJuxxfZBcyxiX4pXcFBMEAtFMUMK3bIA3oOftALuCxLW5W4DS6PzeOXjNZn9_ijadh8d6UJvw4JOAByXRcwu9XNSwICn-pb4BqfIvu7tL_sHRWMFKt4C5Mo97FNr48keXzOeWzy4TiqMCwTKBzwtJbBt3NrgvWoTZzpJx1ioWGnVcQRHphDL0xA6OmyZYw5qOEJ5y8yv5rDt0p5JUWD5EiemF8Pq-0_OXBZ0TU-a-4deBWMnwSqO-i2C7cxzA_d0hC1fRcVhJ7PFnALFXcA" --form "file=@/workspace/accuknox-report.json"'
       ]
     waitFor: ['accuknox-container-scan']
-    id: 'aditya-1'
+    id: 'a-1dbdjkise'
 
   # Step 8: If there are critical or high vulnerabilities, stop deployment
   - name: 'bash'
@@ -56,8 +56,8 @@ steps:
         '-c',
         'if grep -q "CRITICAL\|HIGH" /workspace/accuknox-report.json; then exit 1; else exit 0; fi'
       ]
-    waitFor: ['aditya-1']
-    id: 'aditya-1'
+    waitFor: ['a-1dbdjkise']
+    id: 'a-1dbdjkisef'
 
   # Step 9: Apply Kubernetes Configuration
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -65,7 +65,7 @@ steps:
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
       - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
-    waitFor: ['aditya-2']
+    waitFor: ['a-1dbdjkisef']
 
   # Step 10: Update the Deployment Image
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -79,7 +79,7 @@ steps:
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-west1-a'
       - 'CLOUDSDK_CONTAINER_CLUSTER=gke-cluster-gcb-security-bu'
-    waitFor: ['aditya-2']
+    waitFor: ['a-1dbdjkisef']
 
 # Push the image to Google Container Registry with the latest tag
 images: [
